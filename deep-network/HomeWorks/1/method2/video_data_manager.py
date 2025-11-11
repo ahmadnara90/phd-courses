@@ -1,39 +1,17 @@
-"""
-ماژول مدیریت داده‌های ویدیو
-این ماژول شامل کلاسی برای خواندن و پردازش فایل‌های feature ویدیو است
-"""
 
 import os
 
 
 class VideoDataManager:
-    """
-    کلاس مدیریت داده‌های ویدیو
-    این کلاس برای خواندن و پردازش فایل‌های txt حاوی feature های ویدیو استفاده می‌شود
-    
-    فرمت هر خط در فایل:
-    vid[شماره_ویدیو]_frame_[شماره_فریم],value1,value2,value3,...
-    """
-    
+
     def __init__(self, file_path):
-        """
-        سازنده کلاس
-        
-        Args:
-            file_path (str): مسیر کامل فایل
-        """
+
         self.file_path = file_path
         self.file_name = os.path.basename(file_path)
-        self.data = []  # لیست دیکشنری‌ها: [{'video_name': ..., 'frame_num': ..., 'features': [...]}]
+        self.data = {} 
         
     def get_video_name(self):
-        """
-        استخراج نام ویدیو
-        (در هر فایل، همه فریم‌ها از یک ویدیوی مشخص هستند)
-        
-        Returns:
-            str: نام ویدیو (مثل: vid1202)
-        """
+
         if not self.data:
             self.get_float_values()
         
@@ -41,22 +19,9 @@ class VideoDataManager:
             return self.data[0]['video_name']
         return None
     
-    def get_frame_number(self, line_index=0):
-        """
-        استخراج شماره فریم از یک خط خاص
+    def get_frame_number(self, line):
         
-        Args:
-            line_index (int): شماره خط (پیش‌فرض: اولین خط)
-            
-        Returns:
-            int: شماره فریم
-        """
-        if not self.data:
-            self.get_float_values()
-        
-        if self.data and line_index < len(self.data):
-            return self.data[line_index]['frame_number']
-        return None
+        return line.split(',')[0].split('_')[-1]
     
     def get_float_values(self):
 
@@ -66,8 +31,8 @@ class VideoDataManager:
             with open(self.file_path, 'r') as file:
                 for line_num, line in enumerate(file, 1):
                     line = line.strip()
-                    if line:  # اگر خط خالی نبود
-                        # جداسازی نام فریم از مقادیر
+                    if line:
+
                         parts = line.split(',')
                         if len(parts) < 2:
                             print(f"خطا: خط {line_num} فرمت صحیحی ندارد")
